@@ -1,28 +1,56 @@
-#include "findFilePath.h"
+#include "inputFilePath.hpp"
 
-inputFilePath::inputFilePath(const std::string s, const std::string t) : inputDir(s), fileType(t)
+int inputFilePath::initial(bool flag = true)
 {
+	printf("%5s Check %5s in \"%20s\" %5s\n ", std::string(5, '='), fileType, inputDir, std::string(5, '='));
+	if (flag)
+		printf("%4s CHECK SUB DIRECTORY FUNCTION IS OPEN!! %4s\n", std::string(4, '*'), std::string(4, '*'));
+	else{
+		printf("%4s CHECK SUB DIRECTORY FUNCTION IS CLOSED!! %4s\n", std::string(4, '*'), std::string(4, '*'));
+		CHECKSUBDIR = false;
+	}
+
 	checkInPutDir(inputDir);
 	if (!getFileInfo(inputDir))
 	{
 		std::cout << "Check Files in: \"" << inputDir << "\" Succeed. And fileType is: \"" << fileType << "\"." << std::endl;
 	}else{
 		std::cout << "Check Files in: \"" << inputDir << "\" Failed. And fileType is: \"" << fileType << "\"." << std::endl;
+		return 1;
 	}
 	
+	if (fileName.empty() || filePath.empty())
+	{
+		std::cerr << "No Files Found in \"" << inputDir << "\"." << std::endl;
+		return 1;
+	}else{
+		printf("%4s Search File Complete, Total %5d Found. %4s\n", std::string(4, '='), fileName.size(), std::string(4, '='));
+		return 0;
+	}
 }
 
-int getFileInfo(const std::string &currentDir)
+int inputFilePath::getFileInfo(const std::string &currentDir)
 {
 	if (currentDir.empty())
 	{
-		std::cout << "Initial inputDir Failed, Input Path is empty." << std::endl;
+		std::cerr << "Initial inputDir Failed, Input Path is empty." << std::endl;
 		return 1;
+	}else if (_access(currentDir.c_str(), 4)){
+		std::cerr << "Initial inputDir Failed, Input Path can not be accessed." << std::endl;
+		return 2;
 	}else{
 		std::cout << "Initial inputDir, Input Path: \"" << currentDir << "\"." << std::endl;
 	}
 
 	struct _finddata_t fileInfo;
+	// _finddata_t struct:
+	// unsigned		attrib
+	// time_t		time_create
+	// time_t		time_access
+	// time_t		time_write
+	// _fsize_t		size;
+	// char			name[260]
+	// 
 	std::string fp, fn;
 
 	long h = 0;
@@ -35,7 +63,8 @@ int getFileInfo(const std::string &currentDir)
 			{
 				if (strcmp(fileInfo.name, '.') != 0 && strcmp(fileInfo.name, '..') != 0)
 				{
-					getFileInfo(fp.assign(fileInfo.name).append('/'));
+					if (CHECKSUBDIR)
+						getFileInfo(fp.assign(fileInfo.name).append('/'));
 				}
 			}else{
 				fn.assign(fileInfo.name);
@@ -54,11 +83,7 @@ int getFileInfo(const std::string &currentDir)
 		} while (_findnext(h, &fileInfo) == 0);
 	}
 	_findclose(h);
-
-	if (fileName.empty() || filePath.empty())
-		return 0;
-	else
-		return 1;
+	return 0;
 }
 
 void checkInPutDir(std::string &filePath)
@@ -73,4 +98,6 @@ void checkInPutDir(std::string &filePath)
 			filePath[pos] = '/';
 		}
 	}
+	if (filePath[length-1] != '/')
+		filePath.append('/');
 }
