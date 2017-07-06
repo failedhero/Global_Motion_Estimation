@@ -13,8 +13,8 @@ globalMotionEstimation::globalMotionEstimation(const std::string s, const int r)
 	inputIMG = inputFilePath(rootPath, "png");
 	inputFlow = inputFilePath(rootPath.append("flow/"), "flo");
 
-	parameter = std::make_shared<std::vector<cv::Mat>>();
-	mask = std::make_shared<std::vector<cv::Mat>>();
+	parameter = std::vector<cv::Mat>();
+	mask = std::vector<cv::Mat>();
 }
 
 /*globalMotionEstimation::initial()
@@ -25,9 +25,9 @@ int globalMotionEstimation::initial()
 	// members:
 	// std::map<std::string, std::string> filePath
 	// std::vector<std::string> fileName
-	if (!inputIMG.initial(false))
+	if (inputIMG.initial(false))
 		return 1;
-	if (!inputFlow.initial(false))
+	if (inputFlow.initial(false))
 		return 1;
 	if (inputIMG.fileName.size() != inputFlow.fileName.size() + 1)
 	{
@@ -53,7 +53,7 @@ void globalMotionEstimation::calculateParameter()
 		mask.push_back(GMEModel->mask);
 		parameter.push_back(GMEModel->parameter);
 		showMask(GMEModel->mask);
-	}		
+	}
 }
 
 /*globalMotionEstimation::calculateMotionVector()
@@ -63,12 +63,12 @@ cnt: input,the index of frames for processing */
 void globalMotionEstimation::calculateMotionVector(const int cnt)
 {
 	std::string flowPath(inputFlow.filePath.at(inputFlow.fileName[cnt]));
-	flow = std::make_shared<flowFile>(inputFlow);
+	flow = std::make_shared<flowFile>(flowPath);
 	flow->initial();
 
 	if (cnt == 0)
 	{
-		mask->push_back(cv::Mat::ones(flow->height, flow->width, CV_32F));
+		mask.push_back(cv::Mat::ones(flow->height, flow->width, CV_32F));
 		geneuratePosition(xPos, flow->height, flow->width, true);
 		geneuratePosition(yPos, flow->height, flow->width, false);
 	}
@@ -85,7 +85,7 @@ std::shared_ptr<GMEParameter> globalMotionEstimation::checkRatio(const int cnt)
 		return std::make_shared<GMEParameter6>(this);
 
 	float hRatio, vRatio;
-	calculateRatio(inputFlow.filePath.at(inputFlow.fileName[cnt-1]), inputFlow.filePath.at(inputFlow.fileName[cnt]), hRatio, vRatio);
+	calculateRatio(inputIMG.filePath.at(inputIMG.fileName[cnt-1]), inputIMG.filePath.at(inputIMG.fileName[cnt]), hRatio, vRatio);
 
 	if (hRatio >= 0/5 || vRatio >= 0.5)
 		return std::make_shared<GMEParameter2>(this);
@@ -99,24 +99,24 @@ preImagePath: input,path of pre-frame image
 curImagePath: input,path of current frame image
 hRatio: output
 vRatio: output*/
-void calculateRatio(const std::string preIMGPath, const std::string curIMGPath, float &hRatio, float &wRatio)
+void calculateRatio(const std::string preIMGPath, const std::string curIMGPath, float &hRatio, float &vRatio)
 {
 	cv::Mat preIMG, curIMG, diffIMG, xGRDIMG, yGRDIMG;
-	preIMG = cv::imread(preImagePath, CV_LOAD_IMAGE_GRAYSCALE);
-	curIMG = cv::imread(curImagePath, CV_LOAD_IMAGE_GRAYSCALE);
+	preIMG = cv::imread(preIMGPath, CV_LOAD_IMAGE_GRAYSCALE);
+	curIMG = cv::imread(curIMGPath, CV_LOAD_IMAGE_GRAYSCALE);
 
 	cv::GaussianBlur(preIMG, preIMG, cv::Size(5,5), 3, 3);
 	cv::GaussianBlur(curIMG, curIMG, cv::Size(5,5), 3, 3);
 
 	cv::subtract(curIMG, preIMG, diffIMG);
-	diffIMG.converTo(diffIMG, CV_32F);
+	diffIMG.convertTo(diffIMG, CV_32F);
 	cv::Sobel(preIMG, xGRDIMG, CV_32F, 1,0,1,1,0, cv::BORDER_DEFAULT);
 	cv::Sobel(preIMG, yGRDIMG, CV_32F, 0,1,1,1,0, cv::BORDER_DEFAULT);
 
-	cv::Mat hSTGS = cv::Mat(preImage.size(), CV_32F);
-	cv::Mat vSTGS = cv::Mat(preImage.size(), CV_32F);
-	cv::divide(diffImage, xGrdImage, hSTGS);
-	cv::divide(diffImage, yGrdImage, vSTGS);
+	cv::Mat hSTGS = cv::Mat(preIMG.size(), CV_32F);
+	cv::Mat vSTGS = cv::Mat(preIMG.size(), CV_32F);
+	cv::divide(diffIMG, xGRDIMG, hSTGS);
+	cv::divide(diffIMG, yGRDIMG, vSTGS);
 
 	hRatio = defineMinority(hSTGS);
 	vRatio = defineMinority(vSTGS);
@@ -158,13 +158,14 @@ float defineMinority(cv::Mat &STGS)
 	return varience / (minNum * minNum);
 }
 
-void showmask(cv::Mat data)
+void showMask(cv::Mat data)
 {
 	// show the data in each interation
 	cv::Mat test;
 	double testminv, testmaxv;
 	cv::namedWindow("GlobalMotionEstimation");
-	cv::normalize(data, test, 1, 0, cv::NORM_MINMAX);
+	// cv::normalize(data, test, 1, 0, cv::NORM_MINMAX);
+	data.copyTo(test);
 	test.convertTo(test, CV_8U, 255, 0);
 	cv::minMaxIdx(data, &testminv, &testmaxv);
 	std::cout << testminv << " " << testmaxv << std::endl;

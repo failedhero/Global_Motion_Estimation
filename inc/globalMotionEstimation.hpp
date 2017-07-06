@@ -18,7 +18,7 @@
 
 void calculateRatio(const std::string preIMGPath, const std::string curIMGPath, float &hRatio, float &wRatio);
 float defineMinority(cv::Mat &STGS);
-void showmask(cv::Mat data);
+void showMask(cv::Mat data);
 void geneuratePosition(cv::Mat &pos, int h, int w, bool rowflag);
 
 class GMEParameter;
@@ -30,6 +30,8 @@ class globalMotionEstimation
 {
 public:
 	friend class GMEParameter;
+	friend class GMEParameter2;
+	friend class GMEParameter6;
 
 	globalMotionEstimation(const std::string s, const int r = 1);
 	~globalMotionEstimation() = default;

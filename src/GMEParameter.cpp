@@ -1,13 +1,14 @@
 #include "GMEParameter.hpp"
 
-GMEParameter::GMEParameter(std::shared_ptr<globalMotionEstimation> gme) : GME(gme)
+GMEParameter::GMEParameter(globalMotionEstimation *gme) : GME(gme)
 {
 	mask = *(GME->mask.end() - 1);
 	height = mask.rows;
 	width = mask.cols;
 
-	GME->flow.uFlow.copyTo(xCurPos);
-	GME->flow.vFlow.copyTo(yCurPos);
+	GME->flow->uFlow.copyTo(xCurPos);
+	GME->flow->vFlow.copyTo(yCurPos);
+
 	xCurPos += GME->xPos;
 	yCurPos += GME->yPos;
 
@@ -24,10 +25,10 @@ void GMEParameter::getParameter()
 		exit(1);
 	}
 
-	while (thi.checkIfStop())
+	while (this->checkIfStop())
 	{
-		thi.calculateParameter();
-		thi.updateMask();
+		this->calculateParameter();
+		this->updateMask();
 		parameter.copyTo(preParameter);
 		++reGetCnt;
 	}
@@ -38,23 +39,24 @@ int GMEParameter::initial()
 {
 	reGetCnt = 1;
 	parDiff1 = 1;
-	parDiff2 = 1;	
+	parDiff2 = 1;
 	breakFlag = false;
 
 	diffVar.erase(diffVar.begin(), diffVar.end());
 	diffVar.push_back(100.0);
 	preParameter = cv::Mat::zeros(6,1,CV_32F);
+	parameter = cv::Mat::zeros(6, 1, CV_32F);
 
 	parameter.at<float>(0) = 1.0;
 	parameter.at<float>(1) = 0.0;
-	parameter.at<float>(2) = cv::mean(GME->flow.uFlow).val[0];
+	parameter.at<float>(2) = cv::mean(GME->flow->uFlow).val[0];
 	parameter.at<float>(3) = 0.0;
 	parameter.at<float>(4) = 1.0;	
-	parameter.at<float>(5) = cv::mean(GME->flow.vFlow).val[0];
+	parameter.at<float>(5) = cv::mean(GME->flow->vFlow).val[0];
 
 	cv::Mat tmp1,tmp2,motionVector,ltFlag,gtFlag;
-	cv::pow(GME->flow.uFlow, 2, tmp1);
-	cv::pow(GME->flow.vFlow, 2, tmp2);
+	cv::pow(GME->flow->uFlow, 2, tmp1);
+	cv::pow(GME->flow->vFlow, 2, tmp2);
 	cv::add(tmp1,tmp2,motionVector);
 	cv::pow(motionVector, 0.5, motionVector);
 
@@ -209,49 +211,49 @@ void GMEParameter6::calculateParameter()
 	cv::Mat B(3,2,CV_32F);
 
 	cv::Mat tmp1,tmp2,tmp3,alpha,beta;
-	cv::multiply(GME.xPos, GME.xPos, tmp1);
+	cv::multiply(GME->xPos, GME->xPos, tmp1);
 	cv::multiply(tmp1, mask, tmp1);
 	H.at<float>(0,0) = cv::sum(tmp1).val[0];
-	cv::multiply(GME.xPos, GME.yPos, tmp1);
+	cv::multiply(GME->xPos, GME->yPos, tmp1);
 	cv::multiply(tmp1, mask, tmp1);
 	H.at<float>(0,1) = cv::sum(tmp1).val[0];
-	cv::multiply(GME.xPos, mask, tmp1);
+	cv::multiply(GME->xPos, mask, tmp1);
 	H.at<float>(0,2) = cv::sum(tmp1).val[0];
 
 	H.at<float>(1,0) = H.at<float>(0,1);
-	cv::multiply(GME.yPos, GME.yPos, tmp1);
+	cv::multiply(GME->yPos, GME->yPos, tmp1);
 	cv::multiply(tmp1, mask, tmp1);
 	H.at<float>(1,1) = cv::sum(tmp1).val[0];
-	cv::multiply(GME.yPos, mask, tmp1);
+	cv::multiply(GME->yPos, mask, tmp1);
 	H.at<float>(1,2) = cv::sum(tmp1).val[0];
 
 	H.at<float>(2,0) = H.at<float>(0,2);
 	H.at<float>(2,1) = H.at<float>(1,2);
 	H.at<float>(2,2) = cv::sum(mask).val[0];
 
-	cv::addWeighted(GME.xPos, parameter.at<float>(0), GME.yPos, parameter.at<float>(1), parameter.at<float>(2), alpha);
-	cv::addWeighted(GME.xPos, parameter.at<float>(3), GME.yPos, parameter.at<float>(4), parameter.at<float>(5), beta);
+	cv::addWeighted(GME->xPos, parameter.at<float>(0), GME->yPos, parameter.at<float>(1), parameter.at<float>(2), alpha);
+	cv::addWeighted(GME->xPos, parameter.at<float>(3), GME->yPos, parameter.at<float>(4), parameter.at<float>(5), beta);
 
-	cv::multiply(alpha, GME.xPos, tmp1);
-	cv::multiply(*xCurPos, GME.xPos, tmp2);
+	cv::multiply(alpha, GME->xPos, tmp1);
+	cv::multiply(xCurPos, GME->xPos, tmp2);
 	cv::multiply(tmp1 - tmp2, mask, tmp3);
 	B.at<float>(0,0) = -cv::sum(tmp3).val[0];
-	cv::multiply(alpha, GME.yPos, tmp1);
-	cv::multiply(*xCurPos, GME.yPos, tmp2);
+	cv::multiply(alpha, GME->yPos, tmp1);
+	cv::multiply(xCurPos, GME->yPos, tmp2);
 	cv::multiply(tmp1 - tmp2, mask, tmp3);
 	B.at<float>(1,0) = -cv::sum(tmp3).val[0];
-	cv::multiply(alpha - *xCurPos, mask, tmp3);
+	cv::multiply(alpha - xCurPos, mask, tmp3);
 	B.at<float>(2,0) = -cv::sum(tmp3).val[0];
 
-	cv::multiply(beta, GME.xPos, tmp1);
-	cv::multiply(*yCurPos, GME.xPos, tmp2);
+	cv::multiply(beta, GME->xPos, tmp1);
+	cv::multiply(yCurPos, GME->xPos, tmp2);
 	cv::multiply(tmp1 - tmp2, mask, tmp3);
 	B.at<float>(0,1) = -cv::sum(tmp3).val[0];
-	cv::multiply(beta, GME.yPos, tmp1);
-	cv::multiply(*yCurPos, GME.yPos, tmp2);
+	cv::multiply(beta, GME->yPos, tmp1);
+	cv::multiply(yCurPos, GME->yPos, tmp2);
 	cv::multiply(tmp1 - tmp2, mask, tmp3);
 	B.at<float>(1,1) = -cv::sum(tmp3).val[0];
-	cv::multiply(beta - *yCurPos, mask, tmp3);
+	cv::multiply(beta - yCurPos, mask, tmp3);
 	B.at<float>(2,1) = -cv::sum(tmp3).val[0];
 
 	cv::invert(H, tmp1);
@@ -265,6 +267,6 @@ void GMEParameter6::calculateParameter()
 	parameter.at<float>(4) += tmp3.at<float>(1);
 	parameter.at<float>(5) += tmp3.at<float>(2);
 
-	cv::addWeighted(GME.xPos, parameter.at<float>(0), GME.yPos, parameter.at<float>(1), parameter.at<float>(2), xCalPos);
-	cv::addWeighted(GME.xPos, parameter.at<float>(3), GME.yPos, parameter.at<float>(4), parameter.at<float>(5), yCalPos);	
+	cv::addWeighted(GME->xPos, parameter.at<float>(0), GME->yPos, parameter.at<float>(1), parameter.at<float>(2), xCalPos);
+	cv::addWeighted(GME->xPos, parameter.at<float>(3), GME->yPos, parameter.at<float>(4), parameter.at<float>(5), yCalPos);
 }

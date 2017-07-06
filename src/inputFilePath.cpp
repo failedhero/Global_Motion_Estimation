@@ -2,11 +2,11 @@
 
 int inputFilePath::initial(bool flag = true)
 {
-	printf("%5s Check %5s in \"%20s\" %5s\n ", std::string(5, '='), fileType, inputDir, std::string(5, '='));
+	printf("%5s Check %5s in \"%20s\" %5s\n ", std::string(5, '=').c_str(), fileType.c_str(), inputDir.c_str(), std::string(5, '=').c_str());
 	if (flag)
-		printf("%4s CHECK SUB DIRECTORY FUNCTION IS OPEN!! %4s\n", std::string(4, '*'), std::string(4, '*'));
+		printf("%4s CHECK SUB DIRECTORY FUNCTION IS OPEN!! %4s\n", std::string(4, '*').c_str(), std::string(4, '*').c_str());
 	else{
-		printf("%4s CHECK SUB DIRECTORY FUNCTION IS CLOSED!! %4s\n", std::string(4, '*'), std::string(4, '*'));
+		printf("%4s CHECK SUB DIRECTORY FUNCTION IS CLOSED!! %4s\n", std::string(4, '*').c_str(), std::string(4, '*').c_str());
 		CHECKSUBDIR = false;
 	}
 
@@ -24,7 +24,7 @@ int inputFilePath::initial(bool flag = true)
 		std::cerr << "No Files Found in \"" << inputDir << "\"." << std::endl;
 		return 1;
 	}else{
-		printf("%4s Search File Complete, Total %5d Found. %4s\n", std::string(4, '='), fileName.size(), std::string(4, '='));
+		printf("%4s Search File Complete, Total %5d Found. %4s\n", std::string(4, '=').c_str(), fileName.size(), std::string(4, '=').c_str());
 		return 0;
 	}
 }
@@ -53,7 +53,7 @@ int inputFilePath::getFileInfo(const std::string &currentDir)
 	// 
 	std::string fp, fn;
 
-	long h = 0;
+	intptr_t h;
 
 	if ((h = _findfirst(fp.assign(currentDir).append("*").c_str(), &fileInfo)) != -1)
 	{
@@ -61,10 +61,10 @@ int inputFilePath::getFileInfo(const std::string &currentDir)
 		{
 			if (fileInfo.attrib & _A_SUBDIR)
 			{
-				if (strcmp(fileInfo.name, '.') != 0 && strcmp(fileInfo.name, '..') != 0)
+				if (strcmp(fileInfo.name, ".") != 0 && strcmp(fileInfo.name, "..") != 0)
 				{
 					if (CHECKSUBDIR)
-						getFileInfo(fp.assign(fileInfo.name).append('/'));
+						getFileInfo(fp.assign(fileInfo.name).append("/"));
 				}
 			}else{
 				fn.assign(fileInfo.name);
@@ -73,7 +73,7 @@ int inputFilePath::getFileInfo(const std::string &currentDir)
 
 				if (pos != std::string::npos)
 				{
-					if (fn.compare(pos, sz - pos, fileType) == 0)
+					if (fn.compare(pos + 1, sz - pos - 1, fileType) == 0)
 					{
 						filePath.insert(std::make_pair(fn.substr(0, pos), fp.assign(currentDir).append(fn)));
 						fileName.push_back(fn.substr(0, pos));
@@ -81,8 +81,8 @@ int inputFilePath::getFileInfo(const std::string &currentDir)
 				}
 			}
 		} while (_findnext(h, &fileInfo) == 0);
+		_findclose(h);
 	}
-	_findclose(h);
 	return 0;
 }
 
@@ -99,5 +99,5 @@ void checkInPutDir(std::string &filePath)
 		}
 	}
 	if (filePath[length-1] != '/')
-		filePath.append('/');
+		filePath.append("/");
 }

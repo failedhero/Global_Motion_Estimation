@@ -10,7 +10,7 @@ class GMEParameter
 {
 protected:
 	friend class globalMotionEstimation;
-	GMEParameter(std::shared_ptr<globalMotionEstimation> gme);
+	GMEParameter(globalMotionEstimation *gme);
 	~GMEParameter() = default;
 	
 	virtual void calculateParameter() = 0;
@@ -21,20 +21,20 @@ protected:
 	void updateMask();
 	void errorHist(const cv::Mat &diffPos);
 
-	std::shared_ptr<globalMotionEstimation> GME;
+	globalMotionEstimation *GME;
 
-	cv::Mat xCalPos, yCalPos, preParameter, parameter, mask;
+	cv::Mat xCurPos, yCurPos, xCalPos, yCalPos, preParameter, parameter, mask;
 	std::vector<float> diffVar;
 
 	int reGetCnt, height, width;
-	float parDiff1, sigma1;
+	float parDiff1, sigma1, parDiff2, sigma2;
 	bool breakFlag;
 };
 
 class GMEParameter2 : public GMEParameter
 {
 public:
-	GMEParameter2(std::shared_ptr<globalMotionEstimation> gme) : GMEParameter(gme) { }
+	GMEParameter2(globalMotionEstimation *gme) : GMEParameter(gme) { }
 	bool checkIfStop();
 	void calculateParameter();
 };
@@ -42,10 +42,9 @@ public:
 class GMEParameter6 : public GMEParameter
 {
 public:
-	GMEParameter6(std::shared_ptr<globalMotionEstimation> gme) : GMEParameter(gme) { }
+	GMEParameter6(globalMotionEstimation *gme) : GMEParameter(gme) { }
 	bool checkIfStop();
 	void calculateParameter();
-	float parDiff2, sigma2;
 };
 
 #endif

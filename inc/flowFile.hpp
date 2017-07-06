@@ -19,9 +19,9 @@ public:
 	void changeSize(int r);
 
 	cv::Mat uFlow, vFlow;
+	int height, width;
 private:
 	std::string inputPath;
-	int height, width;
 	float tag;
 };
 
