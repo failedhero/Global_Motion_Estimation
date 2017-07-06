@@ -1,6 +1,6 @@
 #include "GMEParameter.hpp"
 
-GMEParameter::GMEParameter(globalMotionEstimation *gme) : GME(gme)
+GMEParameter::GMEParameter(GlobalMotionEstimation *gme) : GME(gme)
 {
 	mask = *(GME->mask.end() - 1);
 	height = mask.rows;

@@ -1,5 +1,5 @@
-#ifndef _FLOWFILE_HPP
-#define _FLOWFILE_HPP
+#ifndef FLOWFILE_HPP
+#define FLOWFILE_HPP
 
 #include <io.h>
 #include <iostream>
@@ -9,11 +9,11 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-class flowFile
+class FlowFile
 {
 public:
-	flowFile(const std::string s) : inputPath(s) { }
-	~flowFile() = default;
+	FlowFile(const std::string s) : inputPath(s) { }
+	~FlowFile() = default;
 
 	int initial();
 	void changeSize(int r);

@@ -1,6 +1,6 @@
-#include "flowFile.hpp"
+#include "FlowFile.hpp"
 
-int flowFile::initial()
+int FlowFile::initial()
 {
 	if (inputPath.empty() && !_access(inputPath.c_str(), 4))
 	{
@@ -52,7 +52,7 @@ int flowFile::initial()
 	}
 }
 
-void flowFile::changeSize(int ratio)
+void FlowFile::changeSize(int ratio)
 {
 	if (ratio > 1)
 	{

@@ -1,16 +1,16 @@
-#ifndef _GMEPARAMETER_HPP
-#define _GMEPARAMETER_HPP
+#ifndef GMEPARAMETER_HPP
+#define GMEPARAMETER_HPP
 
-#include "globalMotionEstimation.hpp"
+#include "GlobalMotionEstimation.hpp"
 
 /*class gmeParameters:
-	calculate GME parameters and as an sub-process of globalMotionEstimation
-	Initiated with a reference of globalMotionEstimation*/
+	calculate GME parameters and as an sub-process of GlobalMotionEstimation
+	Initiated with a reference of GlobalMotionEstimation*/
 class GMEParameter
 {
 protected:
-	friend class globalMotionEstimation;
-	GMEParameter(globalMotionEstimation *gme);
+	friend class GlobalMotionEstimation;
+	GMEParameter(GlobalMotionEstimation *gme);
 	~GMEParameter() = default;
 	
 	virtual void calculateParameter() = 0;
@@ -21,7 +21,7 @@ protected:
 	void updateMask();
 	void errorHist(const cv::Mat &diffPos);
 
-	globalMotionEstimation *GME;
+	GlobalMotionEstimation *GME;
 
 	cv::Mat xCurPos, yCurPos, xCalPos, yCalPos, preParameter, parameter, mask;
 	std::vector<float> diffVar;
@@ -34,7 +34,7 @@ protected:
 class GMEParameter2 : public GMEParameter
 {
 public:
-	GMEParameter2(globalMotionEstimation *gme) : GMEParameter(gme) { }
+	GMEParameter2(GlobalMotionEstimation *gme) : GMEParameter(gme) { }
 	bool checkIfStop();
 	void calculateParameter();
 };
@@ -42,7 +42,7 @@ public:
 class GMEParameter6 : public GMEParameter
 {
 public:
-	GMEParameter6(globalMotionEstimation *gme) : GMEParameter(gme) { }
+	GMEParameter6(GlobalMotionEstimation *gme) : GMEParameter(gme) { }
 	bool checkIfStop();
 	void calculateParameter();
 };

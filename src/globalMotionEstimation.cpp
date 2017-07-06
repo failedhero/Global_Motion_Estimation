@@ -1,23 +1,23 @@
-#include "globalMotionEstimation.hpp"
+#include "GlobalMotionEstimation.hpp"
 
 /*s: contains flow Directory and frame images
 	<rootPath> --- frame images
 			=>flow Directory <rootPath>/flow/
 			 --- flow files
 ratio: default ratio = 1*/
-globalMotionEstimation::globalMotionEstimation(const std::string s, const int r) : rootPath(s), ratio(r)
+GlobalMotionEstimation::GlobalMotionEstimation(const std::string s, const int r) : rootPath(s), ratio(r)
 {
 	std::string rootPath(s);
 	checkInPutDir(rootPath);
-	inputIMG = inputFilePath(rootPath, "png");
-	inputFlow = inputFilePath(rootPath.append("flow/"), "flo");
+	inputIMG = InputFilePath(rootPath, "png");
+	inputFlow = InputFilePath(rootPath.append("flow/"), "flo");
 
 	parameter = std::vector<cv::Mat>();
 	mask = std::vector<cv::Mat>();
 }
 
 /*Check the files in rootPath and get file lists of image and flow*/
-int globalMotionEstimation::initial()
+int GlobalMotionEstimation::initial()
 {
 	// initial file info
 	// members:
@@ -38,7 +38,7 @@ int globalMotionEstimation::initial()
 }
 
 /*	get GME parameters of motionvector of each frame with GMEParameter*/
-void globalMotionEstimation::calculateParameter()
+void GlobalMotionEstimation::calculateParameter()
 {
 	if (initial())
 		exit(1);
@@ -55,10 +55,10 @@ void globalMotionEstimation::calculateParameter()
 
 /*	read the flowfile and refresh the motionvector, refresh gp with a pointer of gmeParameters for calculating of GME parameters
 cnt: input,the index of frames for processing */
-void globalMotionEstimation::calculateMotionVector(const int cnt)
+void GlobalMotionEstimation::calculateMotionVector(const int cnt)
 {
 	std::string flowPath(inputFlow.filePath.at(inputFlow.fileName[cnt]));
-	flow = std::make_shared<flowFile>(flowPath);
+	flow = std::make_shared<FlowFile>(flowPath);
 	flow->initial();
 
 	if (cnt == 0)
@@ -72,7 +72,7 @@ void globalMotionEstimation::calculateMotionVector(const int cnt)
 
 /*	check which method should be used and return with a pointer to gmeParameters2 or gmeParameters6
 cnt: input,the index of frames for processing*/
-std::shared_ptr<GMEParameter> globalMotionEstimation::checkRatio(const int cnt)
+std::shared_ptr<GMEParameter> GlobalMotionEstimation::checkRatio(const int cnt)
 {
 	if (cnt == 0)
 		return std::make_shared<GMEParameter6>(this);
