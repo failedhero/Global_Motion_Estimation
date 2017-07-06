@@ -15,8 +15,7 @@ GMEParameter::GMEParameter(globalMotionEstimation *gme) : GME(gme)
 	sigma1 = 0.01;
 	sigma2 = 0.000001;
 }
-/*GMEParameter::getParameter()
-	find the GME parameters via interations*/
+/*find the GME parameters via interations*/
 void GMEParameter::getParameter()
 {
 	if (initial())
@@ -33,8 +32,7 @@ void GMEParameter::getParameter()
 		++reGetCnt;
 	}
 }
-/*GMEParameter::initial()
-	initial elements before each iteration*/
+/*initial elements before each iteration*/
 int GMEParameter::initial()
 {
 	reGetCnt = 1;
@@ -70,8 +68,7 @@ int GMEParameter::initial()
 	return 0;
 }
 
-/*GMEParameter::updateMask()
-	refresh the mask after calculating parameters*/
+/*refresh the mask after calculating parameters*/
 void GMEParameter::updateMask()
 {
 	cv:: Mat diffPos, tmp1, tmp2;
@@ -89,8 +86,7 @@ void GMEParameter::updateMask()
 	}
 }
 
-/*GMEParameter::errorHist()
-	refresh mask via calculate histogram of diffPos*/
+/*refresh mask via calculate histogram of diffPos*/
 void GMEParameter::errorHist(const cv::Mat &diffPos)
 {
 	// configure the histogram parameters
@@ -158,8 +154,7 @@ void GMEParameter::errorHist(const cv::Mat &diffPos)
 	cv::multiply(1 - mask, err, mask);	
 }
 
-/*GMEParameter2::checkIfStop()
-	check if stop the interation via justice parDiff1*/
+/*check if stop the interation via justice parDiff1*/
 bool GMEParameter2::checkIfStop()
 {
 	cv::Mat tmp1;
@@ -171,8 +166,7 @@ bool GMEParameter2::checkIfStop()
 		return false;
 }
 
-/*GMEParameter6::checkIfStop()
-	check if stop the interation via justice parDiff1 and parDiff2*/
+/*check if stop the interation via justice parDiff1 and parDiff2*/
 bool GMEParameter6::checkIfStop()
 {
 	cv::Mat tmp1;
@@ -185,8 +179,7 @@ bool GMEParameter6::checkIfStop()
 		return false;
 }
 
-/*GMEParameter2::calculateParameter()
-	calculate the GME parameters with 2P method*/
+/*calculate the GME parameters with 2P method*/
 void GMEParameter2::calculateParameter()
 {
 	GME->xPos.copyTo(xCalPos);
@@ -203,8 +196,7 @@ void GMEParameter2::calculateParameter()
 	parameter.at<float>(5) += cv::sum(beta).val[0] / cv::sum(mask).val[0];
 }
 
-/*GMEParameter6::calculateParameter()
-	calculate the GME parameters with 6P method*/
+/*calculate the GME parameters with 6P method*/
 void GMEParameter6::calculateParameter()
 {
 	cv::Mat H(3,3,CV_32F);
