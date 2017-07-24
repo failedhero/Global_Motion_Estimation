@@ -3,6 +3,7 @@
 
 #include <io.h>
 #include <iostream>
+#include <fstream>
 #include <string>
 
 #include <opencv2/core.hpp>

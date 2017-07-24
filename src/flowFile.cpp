@@ -7,16 +7,15 @@ int FlowFile::initial()
 		std::cerr << "Initial Failed, Please check the input file path: \"" << inputPath << "\"." << std::endl;
 		return 1;
 	}
-	FILE *fid;
-	fopen_s(&fid, inputPath.c_str(), "rb");
-	if (fid == 0)
+	std::ifstream file(inputPath, std::fstream::binary);
+	if (!file.is_open())
 	{
 		std::cerr << "File Read Failed, Accessed Denified: \"" << inputPath << "\"." << std::endl;
 		return 1;
 	}
-	fread(&tag, sizeof(float), 1, fid);
-	fread(&width, sizeof(int), 1, fid);
-	fread(&height, sizeof(int), 1, fid);
+	file.read((char*)&tag, sizeof(float));
+	file.read((char*)&width, sizeof(float));
+	file.read((char*)&height, sizeof(float));
 
 	if (width <= 0 || height <= 0 || width >= 9999 || height >= 9999)
 	{
@@ -29,9 +28,9 @@ int FlowFile::initial()
 
 	int idx = 0;
 	bool flag = true;
-	float tmp;
+	float tmp = 0.0;
 
-	while (fread(&tmp, sizeof(float), 1, fid))
+	while (file.read((char*)&tmp, sizeof(float)))
 	{
 		if (flag)
 		{
@@ -43,7 +42,7 @@ int FlowFile::initial()
 			++idx;
 		}
 	}
-	fclose(fid);
+	file.close();
 
 	if (!flag)
 	{

@@ -92,7 +92,7 @@ void checkInPutDir(std::string &filePath)
 	{
 		for (auto &c : filePath)
 			if (c == '\\')
-				c = '/';\
+				c = '/';
 
 		if (filePath[filePath.size() - 1] != '/')
 			filePath.append("/");
