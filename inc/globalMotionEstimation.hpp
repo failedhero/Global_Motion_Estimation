@@ -1,5 +1,5 @@
-#ifndef _GLOBALMOTIONESTIMATION_HPP
-#define _GLOBALMOTIONESTIMATION_HPP
+#ifndef GLOBALMOTIONESTIMATION_HPP
+#define GLOBALMOTIONESTIMATION_HPP
 
 #include <iostream>
 #include <fstream>
@@ -12,8 +12,8 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "inputFilePath.hpp"
-#include "flowFile.hpp"
+#include "InputFilePath.hpp"
+#include "FlowFile.hpp"
 #include "GMEParameter.hpp"
 
 void calculateRatio(const std::string preIMGPath, const std::string curIMGPath, float &hRatio, float &wRatio);
@@ -23,18 +23,18 @@ void geneuratePosition(cv::Mat &pos, int h, int w, bool rowflag);
 
 class GMEParameter;
 
-/*class globalMotionEstimation:
+/*class GlobalMotionEstimation:
 	calculate motionvector from input path and get the GME parameters
 	Initiated with the rootPath and a ratio for downsampling*/
-class globalMotionEstimation
+class GlobalMotionEstimation
 {
 public:
 	friend class GMEParameter;
 	friend class GMEParameter2;
 	friend class GMEParameter6;
 
-	globalMotionEstimation(const std::string s, const int r = 1);
-	~globalMotionEstimation() = default;
+	GlobalMotionEstimation(const std::string s, const int r = 1);
+	~GlobalMotionEstimation() = default;
 	
 	void calculateParameter();
 
@@ -46,9 +46,9 @@ private:
 	void calculateMotionVector(const int i);
 	std::shared_ptr<GMEParameter> checkRatio(const int i);
 
-	inputFilePath inputIMG;
-	inputFilePath inputFlow;
-	std::shared_ptr<flowFile> flow;
+	InputFilePath inputIMG;
+	InputFilePath inputFlow;
+	std::shared_ptr<FlowFile> flow;
 	std::shared_ptr<GMEParameter> GMEModel;
 
 	unsigned int nbframes;

@@ -1,5 +1,5 @@
-#ifndef _INPUTFILEPATH_HPP
-#define _INPUTFILEPATH_HPP
+#ifndef INPUTFILEPATH_HPP
+#define INPUTFILEPATH_HPP
 
 #include <iostream>
 #include <string>
@@ -9,17 +9,17 @@
 
 void checkInPutDir(std::string &s);
 
-// inputFilePath(const std::string inputDir, const std::string fileType)
+// InputFilePath(const std::string inputDir, const std::string fileType)
 // input: inputDir that contains the searched files, fileType, defined the file type
 // Check the inputDir also the subDir and add the files' names and files' pathes to the map 'filePath' and the vector 'fileName'
-class inputFilePath
+class InputFilePath
 {
 public:
-	inputFilePath() = default;
-	inputFilePath(const std::string s, const std::string t) : inputDir(s), fileType(t) { }
-	~inputFilePath() = default;
+	InputFilePath() = default;
+	InputFilePath(const std::string s, const std::string t) : inputDir(s), fileType(t) { }
+	~InputFilePath() = default;
 
-	// Initial the class 'inputFilePath'
+	// Initial the class 'InputFilePath'
 	// return value:
 	// 0 - normal, 1 - failed
 	int initial(bool flag);

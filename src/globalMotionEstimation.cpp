@@ -1,25 +1,23 @@
-#include "globalMotionEstimation.hpp"
+#include "GlobalMotionEstimation.hpp"
 
-/*globalMotionEstimation::globalMotionEstimation()
-s: contains flow Directory and frame images
+/*s: contains flow Directory and frame images
 	<rootPath> --- frame images
 			=>flow Directory <rootPath>/flow/
 			 --- flow files
 ratio: default ratio = 1*/
-globalMotionEstimation::globalMotionEstimation(const std::string s, const int r) : rootPath(s), ratio(r)
+GlobalMotionEstimation::GlobalMotionEstimation(const std::string s, const int r) : rootPath(s), ratio(r)
 {
 	std::string rootPath(s);
 	checkInPutDir(rootPath);
-	inputIMG = inputFilePath(rootPath, "png");
-	inputFlow = inputFilePath(rootPath.append("flow/"), "flo");
+	inputIMG = InputFilePath(rootPath, "png");
+	inputFlow = InputFilePath(rootPath.append("flow/"), "flo");
 
 	parameter = std::vector<cv::Mat>();
 	mask = std::vector<cv::Mat>();
 }
 
-/*globalMotionEstimation::initial()
-Check the files in rootPath and get file lists of image and flow*/
-int globalMotionEstimation::initial()
+/*Check the files in rootPath and get file lists of image and flow*/
+int GlobalMotionEstimation::initial()
 {
 	// initial file info
 	// members:
@@ -39,9 +37,8 @@ int globalMotionEstimation::initial()
 	}
 }
 
-/*globalMotionEstimation::calculateParameter()
-	get GME parameters of motionvector of each frame with GMEParameter*/
-void globalMotionEstimation::calculateParameter()
+/*	get GME parameters of motionvector of each frame with GMEParameter*/
+void GlobalMotionEstimation::calculateParameter()
 {
 	if (initial())
 		exit(1);
@@ -56,14 +53,12 @@ void globalMotionEstimation::calculateParameter()
 	}
 }
 
-/*globalMotionEstimation::calculateMotionVector()
-	read the flowfile and refresh the motionvector, refresh gp 
-	with a pointer of gmeParameters for calculating of GME parameters
+/*	read the flowfile and refresh the motionvector, refresh gp with a pointer of gmeParameters for calculating of GME parameters
 cnt: input,the index of frames for processing */
-void globalMotionEstimation::calculateMotionVector(const int cnt)
+void GlobalMotionEstimation::calculateMotionVector(const int cnt)
 {
 	std::string flowPath(inputFlow.filePath.at(inputFlow.fileName[cnt]));
-	flow = std::make_shared<flowFile>(flowPath);
+	flow = std::make_shared<FlowFile>(flowPath);
 	flow->initial();
 
 	if (cnt == 0)
@@ -75,11 +70,9 @@ void globalMotionEstimation::calculateMotionVector(const int cnt)
 	GMEModel = checkRatio(cnt);
 }
 
-/*globalMotionEstimation::checkRatio()
-	check which method should be used and return with a pointer to 
-	gmeParameters2 or gmeParameters6
+/*	check which method should be used and return with a pointer to gmeParameters2 or gmeParameters6
 cnt: input,the index of frames for processing*/
-std::shared_ptr<GMEParameter> globalMotionEstimation::checkRatio(const int cnt)
+std::shared_ptr<GMEParameter> GlobalMotionEstimation::checkRatio(const int cnt)
 {
 	if (cnt == 0)
 		return std::make_shared<GMEParameter6>(this);
@@ -93,8 +86,7 @@ std::shared_ptr<GMEParameter> globalMotionEstimation::checkRatio(const int cnt)
 		return std::make_shared<GMEParameter6>(this);
 }
 
-/*calculateRatio: choose the method of GME calculation with 2-parameters
-				or 6-parameters via calculating ratio
+/*choose the method of GME calculation with 2-parameters or 6-parameters via calculating ratio
 preImagePath: input,path of pre-frame image
 curImagePath: input,path of current frame image
 hRatio: output
@@ -122,8 +114,7 @@ void calculateRatio(const std::string preIMGPath, const std::string curIMGPath, 
 	vRatio = defineMinority(vSTGS);
 }
 
-/*defineMinority: calculate ratio of image difference and 
-				image gradient
+/*defineMinority: calculate ratio of image difference and image gradient
 STGS: input,the result of calculateRatio*/
 float defineMinority(cv::Mat &STGS)
 {
@@ -176,8 +167,7 @@ void showMask(cv::Mat data)
 	cv::destroyAllWindows();
 }
 
-/*geneuratePosition: generate a defined metrix with positions values
-	of each one
+/*generate a defined metrix with positions values of each one
 pos: the generated position matrix
 h: input,height of metrix
 w: input,width of metrix

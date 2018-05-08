@@ -1,6 +1,6 @@
-#include "inputFilePath.hpp"
+#include "InputFilePath.hpp"
 
-int inputFilePath::initial(bool flag = true)
+int InputFilePath::initial(bool flag = true)
 {
 	printf("%5s Check %5s in \"%20s\" %5s\n ", std::string(5, '=').c_str(), fileType.c_str(), inputDir.c_str(), std::string(5, '=').c_str());
 	if (flag)
@@ -29,7 +29,7 @@ int inputFilePath::initial(bool flag = true)
 	}
 }
 
-int inputFilePath::getFileInfo(const std::string &currentDir)
+int InputFilePath::getFileInfo(const std::string &currentDir)
 {
 	if (currentDir.empty())
 	{
@@ -68,8 +68,8 @@ int inputFilePath::getFileInfo(const std::string &currentDir)
 				}
 			}else{
 				fn.assign(fileInfo.name);
-				std::size_t sz = fn.size();
-				std::size_t pos = fn.rfind('.', std::string::npos);
+				std::string::size_type sz = fn.size();
+				std::string::size_type pos = fn.rfind('.', std::string::npos);
 
 				if (pos != std::string::npos)
 				{
@@ -88,16 +88,13 @@ int inputFilePath::getFileInfo(const std::string &currentDir)
 
 void checkInPutDir(std::string &filePath)
 {
-	int pos = -1;
-	std::size_t length = filePath.size();
-	for (auto c : filePath)
+	if (!filePath.empty())
 	{
-		++pos;
-		if (c == '\\' && pos < length)
-		{
-			filePath[pos] = '/';
-		}
-	}
-	if (filePath[length-1] != '/')
-		filePath.append("/");
+		for (auto &c : filePath)
+			if (c == '\\')
+				c = '/';
+
+		if (filePath[filePath.size() - 1] != '/')
+			filePath.append("/");
+	}	
 }
