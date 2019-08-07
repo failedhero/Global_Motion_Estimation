@@ -24,7 +24,7 @@ int InputFilePath::initial(bool flag = true)
 		std::cerr << "No Files Found in \"" << inputDir << "\"." << std::endl;
 		return 1;
 	}else{
-		printf("%4s Search File Complete, Total %5d Found. %4s\n", std::string(4, '=').c_str(), fileName.size(), std::string(4, '=').c_str());
+		printf("%4s Search File Complete, Total %5d Found. %4s\n", std::string(4, '=').c_str(), int(fileName.size()), std::string(4, '=').c_str());
 		return 0;
 	}
 }

@@ -34,5 +34,12 @@
 # vscode
 *.vscode/*
 
-# build
+# vs studio
+*/.vs/*
+
+# solution
 build/*
+install/*
+
+# tools
+tools/opencv/*
